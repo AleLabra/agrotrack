@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="estilos.css" />
+  <title>AgroTrack - Contacto</title>
+</head>
+<body>
+  <header class="site">
+    <div class="inner">
+      <div class="brand"><div class="logo"></div> AgroTrack</div>
+      <nav>
+        <a href="/">Inicio</a>
+        <a href="productos.html">Productos</a>
+        <a href="contacto.html">Contacto</a>
+        <a href="login.html">Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <h1>Contacto</h1>
+      <p>¿Tenés una consulta o querés más información sobre nuestras soluciones?  
+      Completá el formulario y te responderemos a la brevedad.</p>
+
+      <form action="/contacto/cargar" method="POST" class="contact-form">
+        <div class="row">
+          <div class="col">
+            <label for="nombre">Nombre completo</label>
+            <input type="text" id="nombre" name="nombre" placeholder="Ej: Juan Pérez" required />
+          </div>
+          <div class="col">
+            <label for="email">Correo electrónico</label>
+            <input type="email" id="email" name="email" placeholder="tunombre@mail.com" required />
+          </div>
+        </div>
+
+        <div>
+          <label for="mensaje">Mensaje</label>
+          <textarea id="mensaje" name="mensaje" rows="6" placeholder="Escribí tu consulta..." required></textarea>
+        </div>
+
+        <div class="row">
+          <button class="btn mint" type="submit">Enviar mensaje</button>
+          <a class="btn outline" href="/contacto/listar">Ver consultas previas</a>
+          <a class="btn outline" href="/">Volver al inicio</a>
+        </div>
+      </form>
+
+      <small class="help">Tu información será utilizada únicamente para responder tu consulta.  
+      No compartimos tus datos con terceros.</small>
+    </div>
+
+    <div class="footer">
+      &copy; 2025 AgroTrack | Innovación tecnológica para el agro.
+    </div>
+  </div>
+</body>
+</html>
