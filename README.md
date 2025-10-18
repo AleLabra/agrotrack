@@ -1,7 +1,7 @@
 # AgroTrack - Portal Interno (MVP)
 
 **Alumno:** Alejandra Labra  
-**Legajo:** (completar)
+**Legajo:** 35418640
 
 ## 🚀 Cómo ejecutar
 ```bash
@@ -38,9 +38,9 @@ Clave: 1234
 ### Ejemplo de bloque en `consultas.txt`
 ```
 -------------------------
-Fecha: 2025-10-06 15:00
-Nombre: Juan Pérez
-Email: jperez@mail.com
+Fecha: 2025-10-15 17:00
+Nombre: Alejandra J Labra
+Email: alejandralabra.at@gmail.com
 Mensaje: Quisiera información sobre servicios.
 -------------------------
 ```

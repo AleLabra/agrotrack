@@ -1,0 +1,244 @@
+{
+	"info": {
+		"_postman_id": "21567883-fe0c-4afc-81db-92463e46473b",
+		"name": "AgroTrack Local",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49368129",
+		"_collection_link": "https://alejandralabra-at-4243047.postman.co/workspace/Alejandra-Labra's-Workspace~740f8961-d683-49c4-89bf-a8ec6363c05d/collection/49368129-21567883-fe0c-4afc-81db-92463e46473b?action=share&source=collection_link&creator=49368129"
+	},
+	"item": [
+		{
+			"name": "Home",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8888/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8888",
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Productos",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8888/productos.html",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8888",
+					"path": [
+						"productos.html"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login (GET limpio)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8888/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8888",
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login (GET .html)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8888/login.html",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8888",
+					"path": [
+						"login.html"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login (POST auth/recuperar)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "usuario",
+							"value": "Juan"
+						},
+						{
+							"key": "clave",
+							"value": "1234"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8888/auth/recuperar",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8888",
+					"path": [
+						"auth",
+						"recuperar"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Contacto (GET limpio)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8888/contacto",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8888",
+					"path": [
+						"contacto"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Contacto (GET .html)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8888/contacto.html",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8888",
+					"path": [
+						"contacto.html"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Contacto (POST cargar)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "nombre",
+							"value": "Juan Pérez"
+						},
+						{
+							"key": "email",
+							"value": "jp@mail.com"
+						},
+						{
+							"key": "mensaje",
+							"value": "Consulta demo"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8888/contacto/cargar",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8888",
+					"path": [
+						"contacto",
+						"cargar"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Contacto (GET listar)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8888/contacto/listar",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8888",
+					"path": [
+						"contacto",
+						"listar"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Error 404 (Ruta Inexistente)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8888/ruta-que-no-existe",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8888",
+					"path": [
+						"ruta-que-no-existe"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

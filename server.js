@@ -1,16 +1,15 @@
-// server.js (patched)
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
 const url = require("url");
 
-const PORT = 8888;
+const PORT = process.env.PORT || 8888;
 
 const MIME_TYPES = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css; charset=utf-8",
   ".js": "application/javascript; charset=utf-8",
-  ".json": "application/json; charset=utf-8",
+  ".json": "application/json",
   ".png": "image/png",
   ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg",
@@ -30,12 +29,23 @@ function serveStatic(filePath, res) {
   fs.readFile(filePath, (err, data) => {
     if (err) {
       if (err.code === "ENOENT") {
-        send(res, 404, "text/html; charset=utf-8", "<h1>404 - Página no encontrada</h1><a href='/'>Volver al inicio</a>");
+        const html404 = renderPage({
+          title: "Página no encontrada — AgroTrack",
+          heading: "404 — Página no encontrada",
+          body: `<p>La ruta solicitada no existe o cambió de ubicación.</p>`,
+          actions: `<a class="btn" href="/">Volver al inicio</a>`
+        });
+        return send(res, 404, "text/html; charset=utf-8", html404);
       } else {
         console.error("Error leyendo archivo:", err);
-        send(res, 500, "text/html; charset=utf-8", "<h1>Error interno del servidor</h1>");
+        const html500 = renderPage({
+          title: "Error interno — AgroTrack",
+          heading: "Error interno del servidor",
+          body: `<p>Ocurrió un problema al procesar tu solicitud.</p>`,
+          actions: `<a class="btn" href="/">Volver al inicio</a>`
+        });
+        return send(res, 500, "text/html; charset=utf-8", html500);
       }
-      return;
     }
     const ext = path.extname(filePath);
     const type = MIME_TYPES[ext] || "application/octet-stream";
@@ -46,9 +56,7 @@ function serveStatic(filePath, res) {
 
 function ensureDataDir() {
   const dir = path.join(__dirname, "data");
-  try {
-    fs.mkdirSync(dir, { recursive: true });
-  } catch (e) {}
+  try { fs.mkdirSync(dir, { recursive: true }); } catch (e) {}
 }
 
 function formatFechaLocal() {
@@ -62,6 +70,41 @@ function formatFechaLocal() {
   return `${y}-${m}-${day} ${h}:${min}`;
 }
 
+function renderPage({ title, heading, body, actions = "" }) {
+  return `<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/estilos.css" />
+  <title>${title}</title>
+</head>
+<body>
+  <header class="site">
+    <div class="inner">
+      <div class="brand"><div class="logo" aria-hidden="true"></div> AgroTrack</div>
+      <nav>
+        <a href="/">Inicio</a>
+        <a href="/productos.html">Productos</a>
+        <a href="/contacto">Contacto</a>
+        <a href="/login">Login</a>
+      </nav>
+    </div>
+  </header>
+  <div class="container">
+    <div class="card" style="max-width:720px;margin-inline:auto">
+      <h1>${heading}</h1>
+      ${body}
+      <div class="row" style="margin-top:12px">
+        ${actions}
+      </div>
+    </div>
+    <div class="footer">MVP académico — Node.js puro (http, fs, url, path)</div>
+  </div>
+</body>
+</html>`;
+}
+
 const server = http.createServer((req, res) => {
   const parsedUrl = url.parse(req.url, true);
   const pathname = decodeURIComponent(parsedUrl.pathname);
@@ -69,7 +112,7 @@ const server = http.createServer((req, res) => {
 
   console.log(new Date().toISOString(), method, pathname);
 
-  // Clean aliases
+  // Aliases
   if (pathname === "/login" && method === "GET") {
     return serveStatic(path.join(__dirname, "public", "login.html"), res);
   }
@@ -92,7 +135,13 @@ const server = http.createServer((req, res) => {
         : path.join(__dirname, "public", pathname.replace(/^\//, ""));
     const publicRoot = path.join(__dirname, "public");
     if (!filePath.startsWith(publicRoot)) {
-      return send(res, 404, "text/html; charset=utf-8", "<h1>404 - Página no encontrada</h1><a href='/'>Volver al inicio</a>");
+      const html404 = renderPage({
+        title: "Página no encontrada — AgroTrack",
+        heading: "404 — Página no encontrada",
+        body: `<p>La ruta solicitada no existe o cambió de ubicación.</p>`,
+        actions: `<a class="btn" href="/">Volver al inicio</a>`
+      });
+      return send(res, 404, "text/html; charset=utf-8", html404);
     }
     return serveStatic(filePath, res);
   }
@@ -107,16 +156,21 @@ const server = http.createServer((req, res) => {
       const clave = (params.get("clave") || "").trim();
 
       if (!usuario || !clave) {
-        return send(res, 400, "text/html; charset=utf-8",
-          "<h1>Datos inválidos</h1><p>Completá usuario y clave.</p><a href='/login'>Volver</a>");
+        const html400 = renderPage({
+          title: "Datos inválidos — AgroTrack",
+          heading: "Faltan datos",
+          body: `<p>Completá <strong>usuario</strong> y <strong>clave</strong> para continuar.</p>`,
+          actions: `<a class="btn" href="/login">Volver</a>`
+        });
+        return send(res, 400, "text/html; charset=utf-8", html400);
       }
 
-      const html = `
-        <h1>Datos recibidos</h1>
-        <p><strong>Usuario:</strong> ${usuario}</p>
-        <p><strong>Clave:</strong> ${clave}</p>
-        <a href="/">Volver al inicio</a>
-      `;
+      const html = renderPage({
+        title: "Acceso — AgroTrack",
+        heading: "Datos recibidos",
+        body: `<p><strong>Usuario:</strong> ${usuario}</p><p><strong>Clave:</strong> ${clave}</p>`,
+        actions: `<a class="btn outline" href="/">Ir al inicio</a>`
+      });
       return send(res, 200, "text/html; charset=utf-8", html);
     });
     return;
@@ -133,8 +187,13 @@ const server = http.createServer((req, res) => {
       const mensaje = (params.get("mensaje") || "").trim();
 
       if (!nombre || !email || !mensaje) {
-        return send(res, 400, "text/html; charset=utf-8",
-          "<h1>Datos inválidos</h1><p>Completá nombre, email y mensaje.</p><a href='/contacto'>Volver</a>");
+        const html400 = renderPage({
+          title: "Datos inválidos — AgroTrack",
+          heading: "Faltan datos",
+          body: `<p>Completá <strong>nombre</strong>, <strong>email</strong> y <strong>mensaje</strong> para continuar.</p>`,
+          actions: `<a class="btn" href="/contacto">Volver al formulario</a>`
+        });
+        return send(res, 400, "text/html; charset=utf-8", html400);
       }
 
       const fecha = formatFechaLocal();
@@ -146,24 +205,41 @@ Email: ${email}
 Mensaje: ${mensaje}
 -------------------------
 `;
-
       try {
         ensureDataDir();
         fs.appendFile(path.join(__dirname, "data", "consultas.txt"), texto, err => {
           if (err) {
             console.error("appendFile error:", err);
-            return send(res, 500, "text/html; charset=utf-8", "<h1>Error interno del servidor</h1>");
+            const html500 = renderPage({
+              title: "Error interno — AgroTrack",
+              heading: "Error interno del servidor",
+              body: `<p>Ocurrió un problema al guardar tu consulta.</p>`,
+              actions: `<a class="btn" href="/">Volver al inicio</a>`
+            });
+            return send(res, 500, "text/html; charset=utf-8", html500);
           }
-          const html = `
-            <h1>Gracias por contactarte, ${nombre}!</h1>
-            <p>Tu consulta fue registrada.</p>
-            <a href="/contacto">Volver al formulario</a> | <a href="/contacto/listar">Ver consultas</a>
-          `;
+          const html = renderPage({
+            title: "Contacto enviado — AgroTrack",
+            heading: `¡Gracias por contactarte, ${nombre}!`,
+            body: `<div class="notice success"><p>Tu consulta fue registrada correctamente.</p></div>
+                   <p>En breve nos pondremos en contacto a <strong>${email}</strong>.</p>`,
+            actions: `
+              <a class="btn" href="/contacto">Volver al formulario</a>
+              <a class="btn mint" href="/contacto/listar">Ver consultas</a>
+              <a class="btn outline" href="/">Ir al inicio</a>
+            `
+          });
           return send(res, 200, "text/html; charset=utf-8", html);
         });
       } catch (e) {
         console.error("Error general grabando consulta:", e);
-        return send(res, 500, "text/html; charset=utf-8", "<h1>Error interno del servidor</h1>");
+        const html500 = renderPage({
+          title: "Error interno — AgroTrack",
+          heading: "Error interno del servidor",
+          body: `<p>Ocurrió un problema al procesar tu solicitud.</p>`,
+          actions: `<a class="btn" href="/">Volver al inicio</a>`
+        });
+        return send(res, 500, "text/html; charset=utf-8", html500);
       }
     });
     return;
@@ -174,16 +250,36 @@ Mensaje: ${mensaje}
     const file = path.join(__dirname, "data", "consultas.txt");
     fs.readFile(file, "utf-8", (err, data) => {
       if (err || !data || !data.trim()) {
-        return send(res, 200, "text/html; charset=utf-8", "<h1>Aún no hay consultas.</h1><a href='/'>Volver al inicio</a>");
+        const html = renderPage({
+          title: "Consultas — AgroTrack",
+          heading: "Consultas recibidas",
+          body: `<div class="notice"><p>Aún no hay consultas.</p></div>`,
+          actions: `<a class="btn" href="/contacto">Volver al formulario</a>`
+        });
+        return send(res, 200, "text/html; charset=utf-8", html);
       }
-      const html = `<h1>Consultas recibidas</h1><pre>${data}</pre><a href='/'>Volver al inicio</a>`;
+      const html = renderPage({
+        title: "Consultas — AgroTrack",
+        heading: "Consultas recibidas",
+        body: `<pre>${data}</pre>`,
+        actions: `
+          <a class="btn" href="/contacto">Cargar otra consulta</a>
+          <a class="btn outline" href="/">Ir al inicio</a>
+        `
+      });
       return send(res, 200, "text/html; charset=utf-8", html);
     });
     return;
   }
 
   // 404
-  return send(res, 404, "text/html; charset=utf-8", "<h1>404 - Ruta no encontrada</h1><a href='/'>Volver al inicio</a>");
+  const html404 = renderPage({
+    title: "Página no encontrada — AgroTrack",
+    heading: "404 — Página no encontrada",
+    body: `<p>La ruta solicitada no existe o cambió de ubicación.</p>`,
+    actions: `<a class="btn" href="/">Volver al inicio</a>`
+  });
+  return send(res, 404, "text/html; charset=utf-8", html404);
 });
 
 server.listen(PORT, () => {
