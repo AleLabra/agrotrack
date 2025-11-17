@@ -1,107 +1,45 @@
-import express from 'express';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import dotenv from 'dotenv';
-import { pool } from './db.js';
-import { logger } from './middleware/logger.js';
-import { errorHandler } from './middleware/errorHandler.js';
-
-// NUEVAS RUTAS Y CONTROLADORES
-import contactoRouter from './routes/contactoRoutes.js';
-import * as contactoController from './controllers/contactoController.js';
-
-// Cargar variables de entorno
+// Configuración inicial
 dotenv.config();
+const app = express();
+const PORT = process.env.PORT || 8888;
 
-// Obtener __dirname en ES Modules
+
+// Necesario para __dirname al usar ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Configuración del servidor
-const PORT = process.env.PORT || 8888;
 
-// Crear la aplicación Express
-const app = express();
-
-// Middleware para parsear JSON y datos de formularios
-app.use(express.json());
+// Middleware
+app.use(logger);
+app.use(express.json()); // API REST trabaja con JSON
 app.use(express.urlencoded({ extended: true }));
 
-// Middleware de logger
-app.use(logger);
 
-// Configurar motor de plantillas EJS
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
-
-// Servir archivos estáticos desde /public
-app.use(express.static('public'));
+// Archivos estáticos
+app.use(express.static(path.join(__dirname, "public")));
 
 
-// -----------------------------------------------------
-//  RUTAS WEB (páginas con HTML estático)
-// -----------------------------------------------------
-
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-app.get('/productos.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'productos.html'));
-});
-
-// Formulario de contacto tradicional (HTML)
-app.get('/contacto.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'contacto.html'));
-});
-
-// Página de login tradicional
-app.get('/login.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'login.html'));
-});
-
-// Estado del servidor
-app.get('/health', (req, res) => {
-    res.json({ status: 'ok' });
+// Endpoint raíz
+app.get("/", (req, res) => {
+res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 
-//  NUEVO MÓDULO MODERNO DE CONTACTO (EJS / Controllers)
-
-// Página de formulario usando EJS (no HTML estático)
-app.get('/contacto', contactoController.mostrarFormulario);
-
-// Procesar formulario
-app.post('/contacto/enviar', contactoController.procesarFormulario);
-
-// Listar consultas en vista EJS
-app.get('/contacto/listar', contactoController.listarConsultas);
+// Endpoint healthcheck
+app.get("/health", (req, res) => {
+res.json({ status: "ok" });
+});
 
 
-//  API REST (JSON) para Contactos
-app.use('/api/contactos', contactoRouter);
+// API REST
+app.use("/api/contactos", contactosRouter);
 
 
-//  MANEJO CENTRALIZADO DE ERRORES
+// Middleware centralizado de errores
 app.use(errorHandler);
 
 
-//  ERROR 404 (si ninguna ruta coincide)
-app.use((req, res) => {
-    res.status(404).render('errores/404');
-});
-
-
-//  INICIAR SERVIDOR//
+// Servidor
 app.listen(PORT, () => {
-    console.log(`🚀 Servidor AgroTrack ejecutándose en http://localhost:${PORT}`);
-    console.log(`📁 Sirviendo archivos desde ./public/`);
-    console.log(`💾 Base de datos conectada: ${process.env.DB_NAME}`);
-});
-
-//  CIERRE DEL SERVIDOR
-process.on('SIGINT', async () => {
-    console.log('\n🛑 Cerrando servidor...');
-    await pool.end();
-    process.exit(0);
+console.log(`Servidor iniciado en http://localhost:${PORT}`);
 });
